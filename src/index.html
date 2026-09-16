@@ -129,7 +129,7 @@
           div.appendChild(video);
         } else {
           const img = document.createElement('img');
-          img.src = item.src;
+          img.src = `/.netlify/images?url=${encodeURIComponent(item.src)}&w=1600&q=80`;
           img.alt = item.caption;
           img.loading = 'lazy';
           div.appendChild(img);
