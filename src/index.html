@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JoaoBrandao.Work</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      background: #fff; color: #1a1a1a;
+      overflow: hidden; height: 100vh; width: 100vw; cursor: default;
+    }
+    .site-title {
+      position: fixed; top: 24px; left: 28px; z-index: 200;
+      font-size: 14px; font-weight: 500; letter-spacing: 0.02em; pointer-events: none;
+    }
+    .gallery {
+      display: flex; height: 100vh; overflow-x: auto; overflow-y: hidden;
+      -webkit-overflow-scrolling: touch; overscroll-behavior-x: contain;
+      padding: 0 8vw;
+    }
+    .gallery::-webkit-scrollbar { display: none; }
+    .gallery { -ms-overflow-style: none; scrollbar-width: none; }
+    .item {
+      flex: 0 0 auto; height: 100vh; display: flex; align-items: center;
+      justify-content: center; position: relative; padding: 0 3vw;
+    }
+    .item img, .item video {
+      max-height: 82vh; max-width: 80vw; width: auto; height: auto;
+      object-fit: contain; display: block; border-radius: 2px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.04); transition: box-shadow 0.3s ease;
+    }
+    .item img:hover, .item video:hover { box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
+    .caption {
+      position: fixed; bottom: 28px; left: 28px; z-index: 300;
+      font-size: 13px; line-height: 1.4; color: #1a1a1a;
+      background: rgba(255,255,255,0.85); backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px); padding: 8px 14px; border-radius: 4px;
+      max-width: 320px; opacity: 0; transform: translateY(6px);
+      transition: opacity 0.25s ease, transform 0.25s ease; pointer-events: none;
+    }
+    .caption.visible { opacity: 1; transform: translateY(0); }
+    .cursor-button {
+      position: fixed; z-index: 400; display: flex; align-items: center;
+      justify-content: center; width: 110px; height: 38px; border-radius: 19px;
+      background: #1a1a1a; color: #fff; font-size: 11px; font-weight: 500;
+      letter-spacing: 0.03em; text-transform: uppercase; pointer-events: none;
+      opacity: 0; transform: translate(-50%, -50%) scale(0.9);
+      transition: opacity 0.2s ease, transform 0.2s ease; white-space: nowrap;
+    }
+    .cursor-button.visible { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+    .gallery.project-hover { cursor: none; }
+    .project-overlay {
+      position: fixed; inset: 0; z-index: 500; background: rgba(255,255,255,0.97);
+      backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+      display: none; flex-direction: column; align-items: center; justify-content: center;
+      padding: 40px; opacity: 0; transition: opacity 0.35s ease;
+    }
+    .project-overlay.open { display: flex; opacity: 1; }
+    .project-overlay .close-btn {
+      position: absolute; top: 24px; right: 28px; font-size: 28px; font-weight: 300;
+      color: #1a1a1a; background: none; border: none; cursor: pointer;
+      line-height: 1; padding: 8px; transition: transform 0.2s ease;
+    }
+    .project-overlay .close-btn:hover { transform: scale(1.1); }
+    .project-overlay h2 { font-size: 24px; font-weight: 500; margin-bottom: 12px; }
+    .project-overlay p  { font-size: 15px; color: #555; max-width: 520px; text-align: center; line-height: 1.6; }
+    .project-overlay .credits { margin-top: 16px; font-size: 13px; color: #888; }
+    @media (max-width: 768px) {
+      .gallery { padding: 0 6vw; }
+      .item { padding: 0 6vw; }
+      .item img, .item video { max-height: 70vh; max-width: 85vw; }
+      .caption { bottom: 20px; left: 20px; font-size: 12px; max-width: 240px; }
+      .site-title { top: 18px; left: 20px; font-size: 13px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="site-title">JoaoBrandao.Work</div>
+  <div class="gallery" id="gallery"></div>
+
+  <div class="caption" id="caption"></div>
+  <div class="cursor-button" id="cursorButton">Open Project</div>
+
+  <div class="project-overlay" id="projectOverlay">
+    <button class="close-btn" id="closeOverlay">&times;</button>
+    <h2 id="overlayTitle"></h2>
+    <p id="overlayDescription"></p>
+    <p class="credits" id="overlayCredits"></p>
+  </div>
+
+  <script>
+    (async function () {
+      'use strict';
+
+      const gallery      = document.getElementById('gallery');
+      const captionEl    = document.getElementById('caption');
+      const cursorBtn    = document.getElementById('cursorButton');
+      const overlay      = document.getElementById('projectOverlay');
+      const overlayTitle = document.getElementById('overlayTitle');
+      const overlayDesc  = document.getElementById('overlayDescription');
+      const overlayCred  = document.getElementById('overlayCredits');
+      const closeOverlay = document.getElementById('closeOverlay');
+
+      let hoveredItem    = null;
+      let isProjectHover = false;
+
+      const res = await fetch('data.json');
+      const { items } = await res.json();
+
+      items.forEach(item => {
+        const div = document.createElement('div');
+        div.className = 'item';
+        div.dataset.caption = item.caption;
+        div.dataset.project = item.project ? 'true' : 'false';
+        if (item.projectId)          div.dataset.projectId          = item.projectId;
+        if (item.projectTitle)       div.dataset.projectTitle       = item.projectTitle;
+        if (item.projectDescription) div.dataset.projectDescription = item.projectDescription;
+        if (item.projectCredits)     div.dataset.projectCredits     = item.projectCredits;
+
+        if (item.kind === 'video') {
+          const video = document.createElement('video');
+          video.autoplay = true; video.loop = true; video.muted = true; video.playsInline = true;
+          const src = document.createElement('source');
+          src.src = item.src; src.type = 'video/mp4';
+          video.appendChild(src);
+          div.appendChild(video);
+        } else {
+          const img = document.createElement('img');
+          img.src = item.src;
+          img.alt = item.caption;
+          img.loading = 'lazy';
+          div.appendChild(img);
+        }
+        gallery.appendChild(div);
+      });
+
+      gallery.addEventListener('wheel', function (e) {
+        const dx = e.deltaX, dy = e.deltaY;
+        if (Math.abs(dx) > Math.abs(dy)) return;
+        e.preventDefault();
+        gallery.scrollLeft += dy;
+      }, { passive: false });
+
+      gallery.addEventListener('mouseover', function (e) {
+        const item = e.target.closest('.item');
+        if (!item || item === hoveredItem) return;
+        if (hoveredItem) leaveItem();
+        hoveredItem = item;
+        captionEl.textContent = item.dataset.caption || '';
+        captionEl.classList.add('visible');
+        if (item.dataset.project === 'true') {
+          isProjectHover = true;
+          gallery.classList.add('project-hover');
+          cursorBtn.classList.add('visible');
+        } else {
+          isProjectHover = false;
+        }
+      });
+
+      gallery.addEventListener('mouseout', function (e) {
+        const item = e.target.closest('.item');
+        if (!item || item !== hoveredItem) return;
+        const related = e.relatedTarget;
+        if (related && item.contains(related)) return;
+        leaveItem();
+        hoveredItem = null;
+      });
+
+      function leaveItem() {
+        captionEl.classList.remove('visible');
+        cursorBtn.classList.remove('visible');
+        gallery.classList.remove('project-hover');
+        isProjectHover = false;
+      }
+
+      gallery.addEventListener('mousemove', function (e) {
+        if (isProjectHover) {
+          cursorBtn.style.left = e.clientX + 'px';
+          cursorBtn.style.top  = e.clientY + 'px';
+        }
+      });
+
+      gallery.addEventListener('click', function (e) {
+        const item = e.target.closest('.item');
+        if (!item || item.dataset.project !== 'true') return;
+        overlayTitle.textContent = item.dataset.projectTitle || '';
+        overlayDesc.textContent  = item.dataset.projectDescription || '';
+        overlayCred.textContent  = item.dataset.projectCredits || '';
+        overlay.classList.add('open');
+        cursorBtn.classList.remove('visible');
+        gallery.classList.remove('project-hover');
+        isProjectHover = false;
+      });
+
+      closeOverlay.addEventListener('click', () => overlay.classList.remove('open'));
+      overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.classList.remove('open'); });
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && overlay.classList.contains('open')) overlay.classList.remove('open');
+      });
+    })();
+  </script>
+
+</body>
+</html>
