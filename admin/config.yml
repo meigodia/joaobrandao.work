@@ -1,8 +1,7 @@
 backend:
   name: github
-  repo: YOUR_GITHUB_USERNAME/joaobrandao.work
+  repo: meigodia/joaobrandao.work
   branch: main
-  base_url: https://YOUR-AUTH-WORKER.workers.dev
 
 media_folder: media
 public_folder: /media
