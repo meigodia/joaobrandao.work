@@ -15,6 +15,7 @@
       position: fixed; top: 24px; left: 28px; z-index: 200;
       font-size: 14px; font-weight: 500; letter-spacing: 0.02em; pointer-events: none;
     }
+    /* ---------- HOME GALLERY ---------- */
     .gallery {
       display: flex; height: 100vh; overflow-x: auto; overflow-y: hidden;
       -webkit-overflow-scrolling: touch; overscroll-behavior-x: contain;
@@ -22,6 +23,7 @@
     }
     .gallery::-webkit-scrollbar { display: none; }
     .gallery { -ms-overflow-style: none; scrollbar-width: none; }
+
     .item {
       flex: 0 0 auto; height: 100vh; display: flex; align-items: center;
       justify-content: center; position: relative; padding: 0 3vw;
@@ -29,9 +31,13 @@
     .item img, .item video {
       max-height: 82vh; max-width: 80vw; width: auto; height: auto;
       object-fit: contain; display: block; border-radius: 2px;
-      box-shadow: 0 2px 12px rgba(0,0,0,0.04); transition: box-shadow 0.3s ease;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+      transition: opacity 0.3s ease, box-shadow 0.3s ease;
+      background: #fafafa;
     }
     .item img:hover, .item video:hover { box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
+
+    /* ---------- CAPTION ---------- */
     .caption {
       position: fixed; bottom: 28px; left: 28px; z-index: 300;
       font-size: 13px; line-height: 1.4; color: #1a1a1a;
@@ -41,6 +47,8 @@
       transition: opacity 0.25s ease, transform 0.25s ease; pointer-events: none;
     }
     .caption.visible { opacity: 1; transform: translateY(0); }
+
+    /* ---------- CURSOR BUTTON ---------- */
     .cursor-button {
       position: fixed; z-index: 400; display: flex; align-items: center;
       justify-content: center; width: 110px; height: 38px; border-radius: 19px;
@@ -51,28 +59,66 @@
     }
     .cursor-button.visible { opacity: 1; transform: translate(-50%, -50%) scale(1); }
     .gallery.project-hover { cursor: none; }
+
+    /* ---------- PROJECT OVERLAY ---------- */
     .project-overlay {
-      position: fixed; inset: 0; z-index: 500; background: rgba(255,255,255,0.97);
-      backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
-      display: none; flex-direction: column; align-items: center; justify-content: center;
-      padding: 40px; opacity: 0; transition: opacity 0.35s ease;
+      position: fixed; inset: 0; z-index: 500;
+      background: #fff;
+      display: none;
     }
-    .project-overlay.open { display: flex; opacity: 1; }
-    .project-overlay .close-btn {
-      position: absolute; top: 24px; right: 28px; font-size: 28px; font-weight: 300;
+    .project-overlay.open { display: block; }
+
+    .overlay-info {
+      position: fixed; top: 24px; left: 28px; z-index: 510;
+      max-width: 340px; pointer-events: none;
+    }
+    .overlay-info h2 {
+      font-size: 14px; font-weight: 500; letter-spacing: 0.02em;
+      margin-bottom: 8px;
+    }
+    .overlay-info p {
+      font-size: 13px; line-height: 1.5; color: #555; margin-bottom: 6px;
+    }
+    .overlay-info .credits { font-size: 12px; color: #888; }
+
+    .overlay-gallery {
+      display: flex; height: 100vh; overflow-x: auto; overflow-y: hidden;
+      -webkit-overflow-scrolling: touch; overscroll-behavior-x: contain;
+      padding: 0 8vw;
+    }
+    .overlay-gallery::-webkit-scrollbar { display: none; }
+    .overlay-gallery { -ms-overflow-style: none; scrollbar-width: none; }
+
+    .overlay-item {
+      flex: 0 0 auto; height: 100vh; display: flex; align-items: center;
+      justify-content: center; padding: 0 3vw;
+    }
+    .overlay-item img, .overlay-item video {
+      max-height: 82vh; max-width: 80vw; width: auto; height: auto;
+      object-fit: contain; display: block; border-radius: 2px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+      background: #fafafa;
+    }
+
+    .close-btn {
+      position: fixed; top: 20px; right: 28px; z-index: 520;
+      font-size: 32px; font-weight: 200; line-height: 1;
       color: #1a1a1a; background: none; border: none; cursor: pointer;
-      line-height: 1; padding: 8px; transition: transform 0.2s ease;
+      padding: 4px 8px; transition: transform 0.2s ease;
     }
-    .project-overlay .close-btn:hover { transform: scale(1.1); }
-    .project-overlay h2 { font-size: 24px; font-weight: 500; margin-bottom: 12px; }
-    .project-overlay p  { font-size: 15px; color: #555; max-width: 520px; text-align: center; line-height: 1.6; }
-    .project-overlay .credits { margin-top: 16px; font-size: 13px; color: #888; }
+    .close-btn:hover { transform: scale(1.1); }
+
     @media (max-width: 768px) {
-      .gallery { padding: 0 6vw; }
-      .item { padding: 0 6vw; }
-      .item img, .item video { max-height: 70vh; max-width: 85vw; }
+      .gallery, .overlay-gallery { padding: 0 6vw; }
+      .item, .overlay-item { padding: 0 6vw; }
+      .item img, .item video,
+      .overlay-item img, .overlay-item video { max-height: 70vh; max-width: 85vw; }
       .caption { bottom: 20px; left: 20px; font-size: 12px; max-width: 240px; }
       .site-title { top: 18px; left: 20px; font-size: 13px; }
+      .overlay-info { top: 18px; left: 20px; max-width: 260px; }
+      .overlay-info h2 { font-size: 13px; }
+      .overlay-info p { font-size: 12px; }
+      .close-btn { top: 14px; right: 18px; }
     }
   </style>
 </head>
@@ -85,76 +131,105 @@
   <div class="cursor-button" id="cursorButton">Open Project</div>
 
   <div class="project-overlay" id="projectOverlay">
+    <div class="overlay-info">
+      <h2 id="overlayTitle"></h2>
+      <p id="overlayDescription"></p>
+      <p class="credits" id="overlayCredits"></p>
+    </div>
+    <div class="overlay-gallery" id="overlayGallery"></div>
     <button class="close-btn" id="closeOverlay">&times;</button>
-    <h2 id="overlayTitle"></h2>
-    <p id="overlayDescription"></p>
-    <p class="credits" id="overlayCredits"></p>
   </div>
 
   <script>
     (async function () {
       'use strict';
 
-      const gallery      = document.getElementById('gallery');
-      const captionEl    = document.getElementById('caption');
-      const cursorBtn    = document.getElementById('cursorButton');
-      const overlay      = document.getElementById('projectOverlay');
-      const overlayTitle = document.getElementById('overlayTitle');
-      const overlayDesc  = document.getElementById('overlayDescription');
-      const overlayCred  = document.getElementById('overlayCredits');
-      const closeOverlay = document.getElementById('closeOverlay');
+      const gallery        = document.getElementById('gallery');
+      const captionEl      = document.getElementById('caption');
+      const cursorBtn      = document.getElementById('cursorButton');
+      const overlay        = document.getElementById('projectOverlay');
+      const overlayTitle   = document.getElementById('overlayTitle');
+      const overlayDesc    = document.getElementById('overlayDescription');
+      const overlayCred    = document.getElementById('overlayCredits');
+      const overlayGallery = document.getElementById('overlayGallery');
+      const closeOverlay   = document.getElementById('closeOverlay');
 
       let hoveredItem    = null;
       let isProjectHover = false;
 
+      // -------- helpers --------
+      const cdnUrl = (src) => `/.netlify/images?url=${encodeURIComponent(src)}&w=1600&q=80`;
+
+      function createMediaElement(kind, src) {
+        if (kind === 'video') {
+          const v = document.createElement('video');
+          v.autoplay = true; v.loop = true; v.muted = true; v.playsInline = true;
+          const s = document.createElement('source');
+          s.src = src; s.type = 'video/mp4';
+          v.appendChild(s);
+          return v;
+        }
+        const img = document.createElement('img');
+        img.src = cdnUrl(src);
+        img.alt = '';
+        return img;
+      }
+
+      // -------- fetch content --------
       const res = await fetch('data.json');
       const { items } = await res.json();
 
+      // -------- build home gallery --------
       items.forEach(item => {
         const div = document.createElement('div');
         div.className = 'item';
-        div.dataset.caption = item.caption;
+        div.dataset.caption = item.caption || '';
         div.dataset.project = item.project ? 'true' : 'false';
-        if (item.projectId)          div.dataset.projectId          = item.projectId;
-        if (item.projectTitle)       div.dataset.projectTitle       = item.projectTitle;
-        if (item.projectDescription) div.dataset.projectDescription = item.projectDescription;
-        if (item.projectCredits)     div.dataset.projectCredits     = item.projectCredits;
 
-        if (item.kind === 'video') {
-          const video = document.createElement('video');
-          video.autoplay = true; video.loop = true; video.muted = true; video.playsInline = true;
-          const src = document.createElement('source');
-          src.src = item.src; src.type = 'video/mp4';
-          video.appendChild(src);
-          div.appendChild(video);
+        if (item.project) {
+          div._projectData = item;
+          div._coverSrc = item.cover;
+          div._coverKind = item.coverKind;
+          div._slideshowIndex = 0;
+          div._slideshowTimer = null;
+
+          const cover = createMediaElement(item.coverKind, item.cover);
+          div.appendChild(cover);
         } else {
-          const img = document.createElement('img');
-          img.src = `/.netlify/images?url=${encodeURIComponent(item.src)}&w=1600&q=80`;
-          img.alt = item.caption;
-          img.loading = 'lazy';
-          div.appendChild(img);
+          const el = createMediaElement('image', item.src);
+          div.appendChild(el);
         }
+
         gallery.appendChild(div);
       });
 
-      gallery.addEventListener('wheel', function (e) {
-        const dx = e.deltaX, dy = e.deltaY;
-        if (Math.abs(dx) > Math.abs(dy)) return;
-        e.preventDefault();
-        gallery.scrollLeft += dy;
-      }, { passive: false });
+      // -------- horizontal wheel scroll (helper) --------
+      function attachWheelScroll(el) {
+        el.addEventListener('wheel', function (e) {
+          const dx = e.deltaX, dy = e.deltaY;
+          if (Math.abs(dx) > Math.abs(dy)) return;
+          e.preventDefault();
+          el.scrollLeft += dy;
+        }, { passive: false });
+      }
+      attachWheelScroll(gallery);
+      attachWheelScroll(overlayGallery);
 
+      // -------- hover: caption + cursor + slideshow --------
       gallery.addEventListener('mouseover', function (e) {
         const item = e.target.closest('.item');
         if (!item || item === hoveredItem) return;
         if (hoveredItem) leaveItem();
         hoveredItem = item;
+
         captionEl.textContent = item.dataset.caption || '';
         captionEl.classList.add('visible');
+
         if (item.dataset.project === 'true') {
           isProjectHover = true;
           gallery.classList.add('project-hover');
           cursorBtn.classList.add('visible');
+          startSlideshow(item);
         } else {
           isProjectHover = false;
         }
@@ -174,8 +249,54 @@
         cursorBtn.classList.remove('visible');
         gallery.classList.remove('project-hover');
         isProjectHover = false;
+        if (hoveredItem && hoveredItem._slideshowTimer) {
+          stopSlideshow(hoveredItem);
+        }
       }
 
+      // -------- slideshow --------
+      function startSlideshow(item) {
+        const data = item._projectData;
+        if (!data || data.media.length < 2) return;
+
+        item._slideshowIndex = 0;
+
+        item._slideshowTimer = setInterval(() => {
+          item._slideshowIndex = (item._slideshowIndex + 1) % data.media.length;
+          const next = data.media[item._slideshowIndex];
+
+          // fade out, swap, fade in
+          const oldEl = item.firstChild;
+          if (oldEl) oldEl.style.opacity = '0';
+
+          setTimeout(() => {
+            while (item.firstChild) item.removeChild(item.firstChild);
+            const el = createMediaElement(next.kind, next.src);
+            el.style.opacity = '0';
+            item.appendChild(el);
+            requestAnimationFrame(() => { el.style.opacity = '1'; });
+          }, 200);
+        }, 1600);
+      }
+
+      function stopSlideshow(item) {
+        if (item._slideshowTimer) {
+          clearInterval(item._slideshowTimer);
+          item._slideshowTimer = null;
+        }
+        // restore original cover
+        const oldEl = item.firstChild;
+        if (oldEl) oldEl.style.opacity = '0';
+        setTimeout(() => {
+          while (item.firstChild) item.removeChild(item.firstChild);
+          const el = createMediaElement(item._coverKind, item._coverSrc);
+          el.style.opacity = '0';
+          item.appendChild(el);
+          requestAnimationFrame(() => { el.style.opacity = '1'; });
+        }, 200);
+      }
+
+      // -------- cursor button follows mouse --------
       gallery.addEventListener('mousemove', function (e) {
         if (isProjectHover) {
           cursorBtn.style.left = e.clientX + 'px';
@@ -183,23 +304,44 @@
         }
       });
 
+      // -------- click project -> overlay --------
       gallery.addEventListener('click', function (e) {
         const item = e.target.closest('.item');
         if (!item || item.dataset.project !== 'true') return;
-        overlayTitle.textContent = item.dataset.projectTitle || '';
-        overlayDesc.textContent  = item.dataset.projectDescription || '';
-        overlayCred.textContent  = item.dataset.projectCredits || '';
+        openProjectOverlay(item._projectData);
+      });
+
+      function openProjectOverlay(proj) {
+        overlayGallery.innerHTML = '';
+        proj.media.forEach(m => {
+          const it = document.createElement('div');
+          it.className = 'overlay-item';
+          it.appendChild(createMediaElement(m.kind, m.src));
+          overlayGallery.appendChild(it);
+        });
+        overlayGallery.scrollLeft = 0;
+
+        overlayTitle.textContent = proj.projectTitle || '';
+        overlayDesc.textContent  = proj.projectDescription || '';
+        overlayCred.textContent  = proj.projectCredits || '';
+
         overlay.classList.add('open');
+
         cursorBtn.classList.remove('visible');
         gallery.classList.remove('project-hover');
         isProjectHover = false;
+        if (hoveredItem && hoveredItem._slideshowTimer) stopSlideshow(hoveredItem);
+      }
+
+      // -------- close overlay --------
+      closeOverlay.addEventListener('click', closeProjectOverlay);
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && overlay.classList.contains('open')) closeProjectOverlay();
       });
 
-      closeOverlay.addEventListener('click', () => overlay.classList.remove('open'));
-      overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.classList.remove('open'); });
-      document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && overlay.classList.contains('open')) overlay.classList.remove('open');
-      });
+      function closeProjectOverlay() {
+        overlay.classList.remove('open');
+      }
     })();
   </script>
 

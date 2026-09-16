@@ -23,9 +23,11 @@ function readCollection(folder) {
 
 const items = [];
 
+// Standalone pieces: one gallery item each
 for (const p of readCollection('pieces')) {
+  if (!p.image) continue;
   items.push({
-    kind: 'image',
+    kind: 'piece',
     src: p.image,
     caption: `${p.title} — ${p.year}`,
     year: p.year,
@@ -33,22 +35,31 @@ for (const p of readCollection('pieces')) {
   });
 }
 
+// Projects: ONE gallery item per project, with all media attached
 for (const proj of readCollection('projects')) {
-  for (const m of (proj.media || [])) {
-    const src = m.type === 'video' ? m.video : m.image;
-    if (!src) continue;
-    items.push({
-      kind: m.type,
-      src,
-      caption: `${proj.title} — ${proj.year}`,
-      year: proj.year,
-      project: true,
-      projectId: proj.slug,
-      projectTitle: proj.title,
-      projectDescription: proj.description || '',
-      projectCredits: proj.credits || '',
-    });
-  }
+  const media = (proj.media || [])
+    .map(m => ({
+      kind: m.type === 'video' ? 'video' : 'image',
+      src: m.type === 'video' ? m.video : m.image,
+      title: m.title || '',
+    }))
+    .filter(m => m.src);
+
+  if (media.length === 0) continue;
+
+  items.push({
+    kind: 'project',
+    cover: media[0].src,
+    coverKind: media[0].kind,
+    media: media,
+    caption: `${proj.title} — ${proj.year}`,
+    year: proj.year,
+    project: true,
+    projectId: proj.slug,
+    projectTitle: proj.title,
+    projectDescription: proj.description || '',
+    projectCredits: proj.credits || '',
+  });
 }
 
 items.sort((a, b) => (b.year || 0) - (a.year || 0));
